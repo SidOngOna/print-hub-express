@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -286,8 +285,8 @@ const NewOrder = () => {
                         onChange={handleFileChange}
                       />
                       <Label htmlFor="document" className="cursor-pointer">
-                        <Button as="span">
-                          Select File
+                        <Button asChild>
+                          <span>Select File</span>
                         </Button>
                       </Label>
                     </div>
