@@ -9,7 +9,187 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      print_orders: {
+        Row: {
+          color_mode: string
+          copies: number
+          created_at: string | null
+          document_url: string
+          double_sided: boolean
+          file_name: string
+          id: string
+          paper_size: string
+          shop_id: string
+          special_instructions: string | null
+          stapled: boolean
+          status: string
+          total_price: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          color_mode: string
+          copies?: number
+          created_at?: string | null
+          document_url: string
+          double_sided?: boolean
+          file_name: string
+          id?: string
+          paper_size: string
+          shop_id: string
+          special_instructions?: string | null
+          stapled?: boolean
+          status?: string
+          total_price?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          color_mode?: string
+          copies?: number
+          created_at?: string | null
+          document_url?: string
+          double_sided?: boolean
+          file_name?: string
+          id?: string
+          paper_size?: string
+          shop_id?: string
+          special_instructions?: string | null
+          stapled?: boolean
+          status?: string
+          total_price?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "print_orders_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "print_shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      print_pricing: {
+        Row: {
+          color_mode: string
+          created_at: string | null
+          double_sided_price: number
+          id: string
+          paper_size: string
+          shop_id: string
+          single_sided_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          color_mode: string
+          created_at?: string | null
+          double_sided_price?: number
+          id?: string
+          paper_size: string
+          shop_id: string
+          single_sided_price?: number
+          updated_at?: string | null
+        }
+        Update: {
+          color_mode?: string
+          created_at?: string | null
+          double_sided_price?: number
+          id?: string
+          paper_size?: string
+          shop_id?: string
+          single_sided_price?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "print_pricing_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "print_shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      print_shops: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string | null
+          description: string | null
+          email: string | null
+          id: string
+          name: string
+          owner_id: string
+          phone: string | null
+          postal_code: string | null
+          state: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          phone?: string | null
+          postal_code?: string | null
+          state?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          postal_code?: string | null
+          state?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          role: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
