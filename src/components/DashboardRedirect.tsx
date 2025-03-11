@@ -13,14 +13,17 @@ export const DashboardRedirect = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log("Checking authentication...");
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
+          console.log("No session found, redirecting to login");
           setRedirectPath("/login");
           setLoading(false);
           return;
         }
 
+        console.log("Session found, checking user role");
         // Check user role
         const { data, error } = await supabase
           .from('profiles')
@@ -28,15 +31,21 @@ export const DashboardRedirect = () => {
           .eq('id', session.user.id)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching user profile:", error);
+          throw error;
+        }
 
         // Redirect based on role
         if (data.role === 'shopkeeper') {
+          console.log("User is a shopkeeper, redirecting to shop dashboard");
           setRedirectPath("/shop-dashboard");
         } else {
+          console.log("User is a regular user, redirecting to user dashboard");
           setRedirectPath("/dashboard");
         }
       } catch (error: any) {
+        console.error("Authentication error:", error);
         toast({
           title: "Authentication Error",
           description: error.message,
@@ -60,5 +69,6 @@ export const DashboardRedirect = () => {
     );
   }
 
+  console.log(`Redirecting to: ${redirectPath}`);
   return <Navigate to={redirectPath} />;
 };

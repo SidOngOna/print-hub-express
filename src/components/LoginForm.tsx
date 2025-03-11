@@ -40,7 +40,10 @@ export function LoginForm() {
         password: values.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Sign in error:", error);
+        throw error;
+      }
 
       toast({
         title: "Welcome back!",
@@ -48,8 +51,11 @@ export function LoginForm() {
       });
 
       // Redirect to dashboard-redirect which will determine the correct dashboard
+      // This ensures consistent redirection based on user role
+      console.log("Login successful, redirecting to dashboard-redirect");
       navigate('/dashboard-redirect');
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Error",
