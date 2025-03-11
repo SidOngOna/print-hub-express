@@ -35,6 +35,17 @@ const Dashboard = () => {
         if (profileError) throw profileError;
         setProfile(profileData);
 
+        // Enforce role check - redirect shopkeepers
+        if (profileData?.role === 'shopkeeper') {
+          toast({
+            title: "Access Denied",
+            description: "Shopkeepers should use the shop dashboard instead.",
+            variant: "destructive",
+          });
+          navigate("/shop-dashboard");
+          return;
+        }
+
         // Fetch orders for user
         const { data: ordersData, error: ordersError } = await supabase
           .from('print_orders')
@@ -69,7 +80,7 @@ const Dashboard = () => {
     );
   }
 
-  // Redirect shopkeepers to their dashboard
+  // This is a secondary check to ensure shopkeepers are redirected
   if (profile?.role === 'shopkeeper') {
     navigate("/shop-dashboard");
     return null;

@@ -16,6 +16,7 @@ import ShopSetup from "./pages/ShopSetup";
 import NewOrder from "./pages/NewOrder";
 import OrderDetail from "./pages/OrderDetail";
 import { AuthGuard } from "./components/AuthGuard";
+import { DashboardRedirect } from "./components/DashboardRedirect";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/dashboard-redirect" element={<DashboardRedirect />} />
               <Route 
                 path="/dashboard" 
                 element={

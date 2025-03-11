@@ -85,7 +85,7 @@ export const AuthGuard = ({
     };
 
     checkAuth();
-  }, [requiredRole, toast]);
+  }, [requiredRole, toast, redirectTo]);
 
   if (loading) {
     return (

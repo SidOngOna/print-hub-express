@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export const DashboardRedirect = () => {
   const { toast } = useToast();
@@ -53,7 +54,8 @@ export const DashboardRedirect = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2">Redirecting to the right dashboard...</p>
       </div>
     );
   }

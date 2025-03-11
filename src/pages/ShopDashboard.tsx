@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +37,13 @@ const ShopDashboard = () => {
         if (profileError) throw profileError;
         setProfile(profileData);
 
+        // Enforce role check - redirect regular users
         if (profileData.role !== 'shopkeeper') {
+          toast({
+            title: "Access Denied",
+            description: "Regular users should use the customer dashboard instead.",
+            variant: "destructive",
+          });
           navigate("/dashboard");
           return;
         }
