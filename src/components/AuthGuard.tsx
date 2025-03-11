@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -56,14 +57,14 @@ export const AuthGuard = ({
             setRedirectPath("/shop-dashboard");
             toast({
               title: "Access Denied",
-              description: "You do not have permission to access this page.",
+              description: "Shopkeepers should use the shop dashboard.",
               variant: "destructive",
             });
           } else if (data.role === 'user') {
             setRedirectPath("/dashboard");
             toast({
               title: "Access Denied",
-              description: "You do not have permission to access this page.",
+              description: "This area is for shopkeepers only.",
               variant: "destructive",
             });
           } else {
@@ -90,7 +91,8 @@ export const AuthGuard = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2">Verifying access...</p>
       </div>
     );
   }

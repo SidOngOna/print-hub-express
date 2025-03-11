@@ -42,26 +42,13 @@ export function LoginForm() {
 
       if (error) throw error;
 
-      // Fetch user profile to get role
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
-        
-      if (profileError) throw profileError;
-
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
 
-      // Redirect based on user role
-      if (profileData.role === 'shopkeeper') {
-        navigate('/shop-dashboard');
-      } else {
-        navigate('/dashboard');
-      }
+      // Redirect to dashboard-redirect which will determine the correct dashboard
+      navigate('/dashboard-redirect');
     } catch (error: any) {
       toast({
         variant: "destructive",

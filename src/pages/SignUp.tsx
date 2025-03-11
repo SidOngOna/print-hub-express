@@ -62,7 +62,7 @@ const SignUp = () => {
       });
 
       if (!loginError) {
-        navigate("/dashboard");
+        navigate("/dashboard-redirect");
       }
     } catch (error: any) {
       toast({

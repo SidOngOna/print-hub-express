@@ -10,7 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 const Login = () => {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,17 +17,6 @@ const Login = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
-        
-        if (session) {
-          // Fetch user profile to get role
-          const { data } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-          
-          setProfile(data);
-        }
       } catch (error) {
         console.error("Error checking auth:", error);
       } finally {
@@ -39,13 +27,9 @@ const Login = () => {
     checkAuth();
   }, [navigate]);
 
-  // Redirect if already logged in
+  // Redirect if already logged in - let the dashboard redirect component handle the role-based routing
   if (!loading && session) {
-    if (profile?.role === 'shopkeeper') {
-      return <Navigate to="/shop-dashboard" />;
-    } else {
-      return <Navigate to="/dashboard" />;
-    }
+    return <Navigate to="/dashboard-redirect" />;
   }
 
   return (
