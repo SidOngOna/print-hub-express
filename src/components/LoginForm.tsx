@@ -35,6 +35,8 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      console.log("Login attempt with:", values.email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
@@ -45,15 +47,29 @@ export function LoginForm() {
         throw error;
       }
 
+      console.log("Login successful, user data:", data.user);
+      
+      // Check if user metadata contains role information
+      const userRole = data.user?.user_metadata?.role;
+      console.log("User role from metadata:", userRole);
+      
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
 
-      // Redirect to dashboard-redirect which will determine the correct dashboard
-      // This ensures consistent redirection based on user role
-      console.log("Login successful, redirecting to dashboard-redirect");
-      navigate('/dashboard-redirect');
+      // If we have role info in metadata, we can directly navigate
+      if (userRole === 'shopkeeper') {
+        console.log("Redirecting to shop dashboard");
+        navigate('/shop-dashboard');
+      } else if (userRole === 'user') {
+        console.log("Redirecting to user dashboard");
+        navigate('/dashboard');
+      } else {
+        // Fall back to dashboard-redirect for role verification
+        console.log("Role not in metadata, redirecting to dashboard-redirect");
+        navigate('/dashboard-redirect');
+      }
     } catch (error: any) {
       console.error("Login error:", error);
       toast({

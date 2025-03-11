@@ -6,6 +6,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const [loading, setLoading] = useState(true);
@@ -15,20 +16,51 @@ const Login = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Login page: Checking for existing session");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
+        console.log("Login page: Session status:", session ? "Logged in" : "Not logged in");
         setSession(session);
       } catch (error) {
-        console.error("Error checking auth:", error);
+        console.error("Login page: Error checking auth:", error);
       } finally {
         setLoading(false);
       }
     };
 
     checkAuth();
+    
+    // Set up auth listener to catch auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Login page: Auth state changed:", event, session ? "Has session" : "No session");
+      setSession(session);
+      
+      if (event === 'SIGNED_IN') {
+        console.log("Login page: User signed in, redirecting to dashboard-redirect");
+        navigate('/dashboard-redirect');
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, [navigate]);
 
-  // Redirect if already logged in - let the dashboard redirect component handle the role-based routing
-  if (!loading && session) {
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2">Checking authentication...</p>
+      </div>
+    );
+  }
+
+  // Redirect if already logged in
+  if (session) {
+    console.log("Login page: Already logged in, redirecting to dashboard-redirect");
     return <Navigate to="/dashboard-redirect" />;
   }
 

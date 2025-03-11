@@ -13,18 +13,31 @@ export const DashboardRedirect = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log("Checking authentication...");
+        console.log("DashboardRedirect: Checking authentication...");
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-          console.log("No session found, redirecting to login");
+          console.log("DashboardRedirect: No session found, redirecting to login");
           setRedirectPath("/login");
           setLoading(false);
           return;
         }
 
-        console.log("Session found, checking user role");
-        // Check user role
+        console.log("DashboardRedirect: Session found:", session.user.id);
+        
+        // First check if role is in user metadata (faster)
+        const userRole = session.user.user_metadata?.role;
+        console.log("DashboardRedirect: Role from metadata:", userRole);
+        
+        if (userRole === 'shopkeeper' || userRole === 'user') {
+          console.log(`DashboardRedirect: Using role from metadata: ${userRole}`);
+          setRedirectPath(userRole === 'shopkeeper' ? "/shop-dashboard" : "/dashboard");
+          setLoading(false);
+          return;
+        }
+
+        console.log("DashboardRedirect: Checking user role from database");
+        // Check user role in database as fallback
         const { data, error } = await supabase
           .from('profiles')
           .select('role')
@@ -32,20 +45,22 @@ export const DashboardRedirect = () => {
           .single();
 
         if (error) {
-          console.error("Error fetching user profile:", error);
+          console.error("DashboardRedirect: Error fetching user profile:", error);
           throw error;
         }
 
+        console.log("DashboardRedirect: Database role:", data.role);
+        
         // Redirect based on role
         if (data.role === 'shopkeeper') {
-          console.log("User is a shopkeeper, redirecting to shop dashboard");
+          console.log("DashboardRedirect: User is a shopkeeper, redirecting to shop dashboard");
           setRedirectPath("/shop-dashboard");
         } else {
-          console.log("User is a regular user, redirecting to user dashboard");
+          console.log("DashboardRedirect: User is a regular user, redirecting to user dashboard");
           setRedirectPath("/dashboard");
         }
       } catch (error: any) {
-        console.error("Authentication error:", error);
+        console.error("DashboardRedirect: Authentication error:", error);
         toast({
           title: "Authentication Error",
           description: error.message,
@@ -69,6 +84,6 @@ export const DashboardRedirect = () => {
     );
   }
 
-  console.log(`Redirecting to: ${redirectPath}`);
+  console.log(`DashboardRedirect: Redirecting to: ${redirectPath}`);
   return <Navigate to={redirectPath} />;
 };
