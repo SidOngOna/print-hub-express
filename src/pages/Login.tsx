@@ -2,10 +2,52 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginForm } from "@/components/LoginForm";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
+  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        
+        if (session) {
+          // Fetch user profile to get role
+          const { data } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+          
+          setProfile(data);
+        }
+      } catch (error) {
+        console.error("Error checking auth:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  // Redirect if already logged in
+  if (!loading && session) {
+    if (profile?.role === 'shopkeeper') {
+      return <Navigate to="/shop-dashboard" />;
+    } else {
+      return <Navigate to="/dashboard" />;
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       <Navbar />

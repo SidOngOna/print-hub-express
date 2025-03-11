@@ -15,6 +15,7 @@ import ShopDashboard from "./pages/ShopDashboard";
 import ShopSetup from "./pages/ShopSetup";
 import NewOrder from "./pages/NewOrder";
 import OrderDetail from "./pages/OrderDetail";
+import { AuthGuard } from "./components/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -50,11 +51,46 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/shop-dashboard" element={<ShopDashboard />} />
-              <Route path="/shop-setup" element={<ShopSetup />} />
-              <Route path="/new-order" element={<NewOrder />} />
-              <Route path="/order/:id" element={<OrderDetail />} />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <AuthGuard requiredRole="user">
+                    <Dashboard />
+                  </AuthGuard>
+                } 
+              />
+              <Route 
+                path="/shop-dashboard" 
+                element={
+                  <AuthGuard requiredRole="shopkeeper">
+                    <ShopDashboard />
+                  </AuthGuard>
+                } 
+              />
+              <Route 
+                path="/shop-setup" 
+                element={
+                  <AuthGuard requiredRole="shopkeeper">
+                    <ShopSetup />
+                  </AuthGuard>
+                } 
+              />
+              <Route 
+                path="/new-order" 
+                element={
+                  <AuthGuard requiredRole="user">
+                    <NewOrder />
+                  </AuthGuard>
+                } 
+              />
+              <Route 
+                path="/order/:id" 
+                element={
+                  <AuthGuard>
+                    <OrderDetail />
+                  </AuthGuard>
+                } 
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
