@@ -7,24 +7,45 @@ import { Navbar } from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         console.log("Login page: Checking for existing session");
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getSession();
         
-        if (error) throw error;
+        if (error) {
+          console.error("Login page: Error getting session:", error);
+          toast({
+            variant: "destructive",
+            title: "Session Error",
+            description: "There was an error checking your login status",
+          });
+          setSession(null);
+          setLoading(false);
+          return;
+        }
         
-        console.log("Login page: Session status:", session ? "Logged in" : "Not logged in");
-        setSession(session);
+        const currentSession = data.session;
+        console.log("Login page: Session status:", currentSession ? "Logged in" : "Not logged in");
+        
+        if (currentSession) {
+          console.log("Login page: User is already logged in:", currentSession.user.id);
+          console.log("Login page: User email:", currentSession.user.email);
+          console.log("Login page: User role:", currentSession.user.user_metadata?.role || "No role");
+        }
+        
+        setSession(currentSession);
       } catch (error) {
         console.error("Login page: Error checking auth:", error);
+        setSession(null);
       } finally {
         setLoading(false);
       }
@@ -35,6 +56,12 @@ const Login = () => {
     // Set up auth listener to catch auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Login page: Auth state changed:", event, session ? "Has session" : "No session");
+      
+      if (session) {
+        console.log("Login page: User data from event:", session.user.id);
+        console.log("Login page: User role from event:", session.user.user_metadata?.role || "No role");
+      }
+      
       setSession(session);
       
       if (event === 'SIGNED_IN') {
@@ -46,7 +73,7 @@ const Login = () => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, toast]);
 
   // Show loading state while checking auth
   if (loading) {

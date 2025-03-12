@@ -37,6 +37,10 @@ export function LoginForm() {
     try {
       console.log("Login attempt with:", values.email);
       
+      // Clear any existing sessions first to avoid conflicts
+      console.log("Clearing any existing sessions...");
+      await supabase.auth.signOut();
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
@@ -48,13 +52,13 @@ export function LoginForm() {
       }
 
       console.log("Login successful, user data:", data.user);
+      console.log("Session created:", data.session?.access_token ? "Yes" : "No");
       
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
 
-      // Always redirect to dashboard-redirect for consistent role verification
       console.log("Redirecting to dashboard-redirect for role verification");
       navigate('/dashboard-redirect');
       
