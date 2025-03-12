@@ -29,20 +29,10 @@ const Login = () => {
             description: "There was an error checking your login status",
           });
           setSession(null);
-          setLoading(false);
-          return;
+        } else {
+          console.log("Login page: Session status:", data.session ? "Logged in" : "Not logged in");
+          setSession(data.session);
         }
-        
-        const currentSession = data.session;
-        console.log("Login page: Session status:", currentSession ? "Logged in" : "Not logged in");
-        
-        if (currentSession) {
-          console.log("Login page: User is already logged in:", currentSession.user.id);
-          console.log("Login page: User email:", currentSession.user.email);
-          console.log("Login page: User role:", currentSession.user.user_metadata?.role || "No role");
-        }
-        
-        setSession(currentSession);
       } catch (error) {
         console.error("Login page: Error checking auth:", error);
         setSession(null);
@@ -56,12 +46,6 @@ const Login = () => {
     // Set up auth listener to catch auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Login page: Auth state changed:", event, session ? "Has session" : "No session");
-      
-      if (session) {
-        console.log("Login page: User data from event:", session.user.id);
-        console.log("Login page: User role from event:", session.user.user_metadata?.role || "No role");
-      }
-      
       setSession(session);
       
       if (event === 'SIGNED_IN') {
