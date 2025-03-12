@@ -27,33 +27,40 @@ export const DashboardRedirect = () => {
         
         // First check if role is in user metadata (faster)
         const userMetadata = session.user.user_metadata;
-        const userRole = userMetadata?.role;
+        let userRole = userMetadata?.role;
         console.log("DashboardRedirect: Role from metadata:", userRole);
         
-        if (userRole === 'shopkeeper' || userRole === 'user') {
-          console.log(`DashboardRedirect: Using role from metadata: ${userRole}`);
-          setRedirectPath(userRole === 'shopkeeper' ? "/shop-dashboard" : "/dashboard");
-          setLoading(false);
-          return;
+        // If not found in metadata, check the database
+        if (!userRole) {
+          console.log("DashboardRedirect: Checking user role from database");
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+          if (error) {
+            console.error("DashboardRedirect: Error fetching user profile:", error);
+            throw error;
+          }
+
+          userRole = data.role;
+          console.log("DashboardRedirect: Database role:", userRole);
+          
+          // Update the metadata with the role from the database for future use
+          const { error: updateError } = await supabase.auth.updateUser({
+            data: { role: userRole }
+          });
+          
+          if (updateError) {
+            console.error("DashboardRedirect: Error updating user metadata:", updateError);
+          } else {
+            console.log("DashboardRedirect: Updated user metadata with role:", userRole);
+          }
         }
-
-        console.log("DashboardRedirect: Checking user role from database");
-        // Check user role in database as fallback
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error) {
-          console.error("DashboardRedirect: Error fetching user profile:", error);
-          throw error;
-        }
-
-        console.log("DashboardRedirect: Database role:", data.role);
         
         // Redirect based on role
-        if (data.role === 'shopkeeper') {
+        if (userRole === 'shopkeeper') {
           console.log("DashboardRedirect: User is a shopkeeper, redirecting to shop dashboard");
           setRedirectPath("/shop-dashboard");
         } else {

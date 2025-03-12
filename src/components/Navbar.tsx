@@ -24,6 +24,10 @@ export const Navbar = () => {
       setSession(session);
 
       if (session) {
+        // Check metadata first for the role
+        const metadataRole = session.user.user_metadata?.role;
+        
+        // Fetch profile data
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -31,6 +35,13 @@ export const Navbar = () => {
           .single();
 
         if (!error && data) {
+          // If metadata doesn't have the role but profile does, update metadata
+          if (!metadataRole && data.role) {
+            await supabase.auth.updateUser({
+              data: { role: data.role }
+            });
+          }
+          
           setProfile(data);
         }
       }

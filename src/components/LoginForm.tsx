@@ -54,6 +54,21 @@ export function LoginForm() {
       console.log("Login successful, user data:", data.user);
       console.log("Session created:", data.session?.access_token ? "Yes" : "No");
       
+      // Check user role from metadata
+      const userRole = data.user.user_metadata?.role || null;
+      console.log("User role from metadata:", userRole);
+      
+      // Also check the profile table to get the role
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (!profileError && profileData) {
+        console.log("User role from profile table:", profileData.role);
+      }
+      
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
