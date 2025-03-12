@@ -26,7 +26,8 @@ export const DashboardRedirect = () => {
         console.log("DashboardRedirect: Session found:", session.user.id);
         
         // First check if role is in user metadata (faster)
-        const userRole = session.user.user_metadata?.role;
+        const userMetadata = session.user.user_metadata;
+        const userRole = userMetadata?.role;
         console.log("DashboardRedirect: Role from metadata:", userRole);
         
         if (userRole === 'shopkeeper' || userRole === 'user') {

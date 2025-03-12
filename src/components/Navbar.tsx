@@ -71,6 +71,11 @@ export const Navbar = () => {
     return profile.role === "shopkeeper" ? "/shop-dashboard" : "/dashboard";
   };
 
+  const getRoleLabel = () => {
+    if (!profile) return "";
+    return profile.role === "shopkeeper" ? "Print Shop Owner" : "Print User";
+  };
+
   return (
     <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -96,6 +101,9 @@ export const Navbar = () => {
                   </div>
                   <div className="px-2 py-1.5 text-xs text-muted-foreground">
                     {session.user.email}
+                  </div>
+                  <div className="px-2 py-1.5 text-xs font-medium bg-primary/10 text-primary rounded mx-2">
+                    {getRoleLabel()}
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>

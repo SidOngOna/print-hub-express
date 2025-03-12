@@ -49,27 +49,15 @@ export function LoginForm() {
 
       console.log("Login successful, user data:", data.user);
       
-      // Check if user metadata contains role information
-      const userRole = data.user?.user_metadata?.role;
-      console.log("User role from metadata:", userRole);
-      
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
 
-      // If we have role info in metadata, we can directly navigate
-      if (userRole === 'shopkeeper') {
-        console.log("Redirecting to shop dashboard");
-        navigate('/shop-dashboard');
-      } else if (userRole === 'user') {
-        console.log("Redirecting to user dashboard");
-        navigate('/dashboard');
-      } else {
-        // Fall back to dashboard-redirect for role verification
-        console.log("Role not in metadata, redirecting to dashboard-redirect");
-        navigate('/dashboard-redirect');
-      }
+      // Always redirect to dashboard-redirect for consistent role verification
+      console.log("Redirecting to dashboard-redirect for role verification");
+      navigate('/dashboard-redirect');
+      
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
