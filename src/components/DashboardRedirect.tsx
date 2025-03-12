@@ -37,25 +37,27 @@ export const DashboardRedirect = () => {
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle(); // Use maybeSingle instead of single to prevent errors
 
           if (error) {
             console.error("DashboardRedirect: Error fetching user profile:", error);
             throw error;
           }
 
-          userRole = data.role;
+          userRole = data?.role;
           console.log("DashboardRedirect: Database role:", userRole);
           
           // Update the metadata with the role from the database for future use
-          const { error: updateError } = await supabase.auth.updateUser({
-            data: { role: userRole }
-          });
-          
-          if (updateError) {
-            console.error("DashboardRedirect: Error updating user metadata:", updateError);
-          } else {
-            console.log("DashboardRedirect: Updated user metadata with role:", userRole);
+          if (userRole) {
+            const { error: updateError } = await supabase.auth.updateUser({
+              data: { role: userRole }
+            });
+            
+            if (updateError) {
+              console.error("DashboardRedirect: Error updating user metadata:", updateError);
+            } else {
+              console.log("DashboardRedirect: Updated user metadata with role:", userRole);
+            }
           }
         }
         
@@ -71,7 +73,7 @@ export const DashboardRedirect = () => {
         console.error("DashboardRedirect: Authentication error:", error);
         toast({
           title: "Authentication Error",
-          description: error.message,
+          description: error.message || "Failed to verify your access",
           variant: "destructive",
         });
         setRedirectPath("/login");

@@ -40,27 +40,41 @@ export const AuthGuard = ({
           return;
         }
 
-        // Check user role
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
+        // First check user metadata for role (faster)
+        let userRole = session.user.user_metadata?.role;
+        
+        // If not in metadata, check the profiles table
+        if (!userRole) {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .maybeSingle(); // Using maybeSingle instead of single
 
-        if (error) throw error;
+          if (error) throw error;
+          
+          userRole = data?.role;
+          
+          // Update metadata for future use if we found a role
+          if (userRole) {
+            await supabase.auth.updateUser({
+              data: { role: userRole }
+            });
+          }
+        }
 
-        if (data.role === requiredRole) {
+        if (userRole === requiredRole) {
           setAuthorized(true);
         } else {
           // Redirect to appropriate dashboard based on actual role
-          if (data.role === 'shopkeeper') {
+          if (userRole === 'shopkeeper') {
             setRedirectPath("/shop-dashboard");
             toast({
               title: "Access Denied",
               description: "Shopkeepers should use the shop dashboard.",
               variant: "destructive",
             });
-          } else if (data.role === 'user') {
+          } else if (userRole === 'user') {
             setRedirectPath("/dashboard");
             toast({
               title: "Access Denied",
