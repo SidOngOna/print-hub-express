@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 
 interface AuthGuardProps {
   children: ReactNode;
-  requiredRole?: "user" | "shopkeeper" | undefined;
+  requiredRole?: "user" | "shopkeeper" | "admin" | undefined;
   redirectTo?: string;
 }
 
@@ -67,18 +67,25 @@ export const AuthGuard = ({
           setAuthorized(true);
         } else {
           // Redirect to appropriate dashboard based on actual role
-          if (userRole === 'shopkeeper') {
+          if (userRole === 'admin') {
+            setRedirectPath("/admin-dashboard");
+            toast({
+              title: "Access Denied",
+              description: `${requiredRole === 'user' ? 'User' : 'Shopkeeper'} access only. Redirecting to admin dashboard.`,
+              variant: "destructive",
+            });
+          } else if (userRole === 'shopkeeper') {
             setRedirectPath("/shop-dashboard");
             toast({
               title: "Access Denied",
-              description: "Shopkeepers should use the shop dashboard.",
+              description: `${requiredRole === 'user' ? 'User' : 'Admin'} access only. Redirecting to shop dashboard.`,
               variant: "destructive",
             });
           } else if (userRole === 'user') {
             setRedirectPath("/dashboard");
             toast({
               title: "Access Denied",
-              description: "This area is for shopkeepers only.",
+              description: `${requiredRole === 'shopkeeper' ? 'Shopkeeper' : 'Admin'} access only. Redirecting to user dashboard.`,
               variant: "destructive",
             });
           } else {

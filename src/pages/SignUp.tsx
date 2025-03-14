@@ -18,7 +18,8 @@ const SignUp = () => {
     password: "",
     firstName: "",
     lastName: "",
-    role: "user" as "user" | "shopkeeper",
+    role: "user" as "user" | "shopkeeper" | "admin",
+    adminSecret: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +28,7 @@ const SignUp = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRoleChange = (value: "user" | "shopkeeper") => {
+  const handleRoleChange = (value: "user" | "shopkeeper" | "admin") => {
     setFormData((prev) => ({ ...prev, role: value }));
   };
 
@@ -36,6 +37,11 @@ const SignUp = () => {
     setLoading(true);
 
     try {
+      // Check admin secret if admin role is selected
+      if (formData.role === "admin" && formData.adminSecret !== "admin123") {
+        throw new Error("Invalid admin secret. Please contact system administrator.");
+      }
+
       const { error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -145,7 +151,7 @@ const SignUp = () => {
                   <RadioGroup
                     value={formData.role}
                     onValueChange={handleRoleChange as (value: string) => void}
-                    className="flex space-x-4"
+                    className="flex flex-wrap space-x-4"
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="user" id="user" />
@@ -155,8 +161,30 @@ const SignUp = () => {
                       <RadioGroupItem value="shopkeeper" id="shopkeeper" />
                       <Label htmlFor="shopkeeper">Print Shop Owner</Label>
                     </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="admin" id="admin" />
+                      <Label htmlFor="admin">Admin</Label>
+                    </div>
                   </RadioGroup>
                 </div>
+
+                {formData.role === "admin" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="adminSecret">Admin Secret</Label>
+                    <Input
+                      id="adminSecret"
+                      name="adminSecret"
+                      type="password"
+                      placeholder="Enter admin secret"
+                      required
+                      value={formData.adminSecret}
+                      onChange={handleChange}
+                    />
+                    <p className="text-xs text-gray-500">
+                      Contact system administrator to get the admin secret.
+                    </p>
+                  </div>
+                )}
               </CardContent>
               <CardFooter className="flex flex-col space-y-4">
                 <Button className="w-full" type="submit" disabled={loading}>

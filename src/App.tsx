@@ -12,6 +12,7 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ShopDashboard from "./pages/ShopDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import ShopSetup from "./pages/ShopSetup";
 import NewOrder from "./pages/NewOrder";
 import OrderDetail from "./pages/OrderDetail";
@@ -66,6 +67,14 @@ const App = () => {
                 element={
                   <AuthGuard requiredRole="shopkeeper">
                     <ShopDashboard />
+                  </AuthGuard>
+                } 
+              />
+              <Route 
+                path="/admin-dashboard" 
+                element={
+                  <AuthGuard requiredRole="admin">
+                    <AdminDashboard />
                   </AuthGuard>
                 } 
               />

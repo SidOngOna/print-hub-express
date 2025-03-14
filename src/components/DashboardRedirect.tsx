@@ -62,7 +62,10 @@ export const DashboardRedirect = () => {
         }
         
         // Redirect based on role
-        if (userRole === 'shopkeeper') {
+        if (userRole === 'admin') {
+          console.log("DashboardRedirect: User is an admin, redirecting to admin dashboard");
+          setRedirectPath("/admin-dashboard");
+        } else if (userRole === 'shopkeeper') {
           console.log("DashboardRedirect: User is a shopkeeper, redirecting to shop dashboard");
           setRedirectPath("/shop-dashboard");
         } else {

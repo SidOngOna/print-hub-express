@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Printer, User, LogOut } from "lucide-react";
+import { Printer, User, LogOut, Shield } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,7 +32,7 @@ export const Navbar = () => {
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (!error && data) {
           // If metadata doesn't have the role but profile does, update metadata
@@ -60,7 +60,7 @@ export const Navbar = () => {
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
 
           setProfile(data || null);
         } else {
@@ -79,12 +79,20 @@ export const Navbar = () => {
 
   const getDashboardLink = () => {
     if (!profile) return "/dashboard";
+    if (profile.role === "admin") return "/admin-dashboard";
     return profile.role === "shopkeeper" ? "/shop-dashboard" : "/dashboard";
   };
 
   const getRoleLabel = () => {
     if (!profile) return "";
+    if (profile.role === "admin") return "System Administrator";
     return profile.role === "shopkeeper" ? "Print Shop Owner" : "Print User";
+  };
+
+  const getRoleIcon = () => {
+    if (!profile) return <User className="h-5 w-5" />;
+    if (profile.role === "admin") return <Shield className="h-5 w-5 text-purple-600" />;
+    return <User className="h-5 w-5" />;
   };
 
   return (
@@ -103,7 +111,7 @@ export const Navbar = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
+                    {getRoleIcon()}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -113,7 +121,11 @@ export const Navbar = () => {
                   <div className="px-2 py-1.5 text-xs text-muted-foreground">
                     {session.user.email}
                   </div>
-                  <div className="px-2 py-1.5 text-xs font-medium bg-primary/10 text-primary rounded mx-2">
+                  <div className={`px-2 py-1.5 text-xs font-medium rounded mx-2 ${
+                    profile?.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                    profile?.role === 'shopkeeper' ? 'bg-primary/10 text-primary' :
+                    'bg-green-100 text-green-800'
+                  }`}>
                     {getRoleLabel()}
                   </div>
                   <DropdownMenuSeparator />
@@ -126,6 +138,13 @@ export const Navbar = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/new-order" className="cursor-pointer w-full">
                         New Order
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {profile?.role === "admin" && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/system-settings" className="cursor-pointer w-full">
+                        System Settings
                       </Link>
                     </DropdownMenuItem>
                   )}
