@@ -19,6 +19,7 @@ const Login = () => {
     const checkAuth = async () => {
       try {
         console.log("Login page: Checking for existing session");
+        setLoading(true);
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -59,16 +60,6 @@ const Login = () => {
     };
   }, [navigate, toast]);
 
-  // Show loading state while checking auth
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="ml-2">Checking authentication...</p>
-      </div>
-    );
-  }
-
   // Redirect if already logged in
   if (session) {
     console.log("Login page: Already logged in, redirecting to dashboard-redirect");
@@ -80,23 +71,32 @@ const Login = () => {
       <Navbar />
       <div className="container mx-auto px-4 pt-24 pb-16">
         <div className="max-w-md mx-auto">
-          <Card>
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
-              <CardDescription className="text-center">
-                Enter your credentials to sign in
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <LoginForm />
-              <div className="mt-4 text-center text-sm">
-                <span className="text-muted-foreground">Don't have an account? </span>
-                <Button variant="link" className="p-0" asChild>
-                  <Link to="/signup">Sign up</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {loading ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center p-6">
+                <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                <p>Checking authentication...</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
+                <CardDescription className="text-center">
+                  Enter your credentials to sign in
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LoginForm />
+                <div className="mt-4 text-center text-sm">
+                  <span className="text-muted-foreground">Don't have an account? </span>
+                  <Button variant="link" className="p-0" asChild>
+                    <Link to="/signup">Sign up</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

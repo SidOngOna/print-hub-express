@@ -63,7 +63,7 @@ export const AuthGuard = ({
           }
         }
 
-        if (userRole === requiredRole) {
+        if (userRole === requiredRole || (requiredRole === 'user' && !userRole)) {
           setAuthorized(true);
         } else {
           // Redirect to appropriate dashboard based on actual role
@@ -94,6 +94,7 @@ export const AuthGuard = ({
           setAuthorized(false);
         }
       } catch (error: any) {
+        console.error("AuthGuard error:", error);
         toast({
           title: "Authentication Error",
           description: error.message,
@@ -111,9 +112,9 @@ export const AuthGuard = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="ml-2">Verifying access...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+        <p className="text-lg">Verifying access...</p>
       </div>
     );
   }
