@@ -9,16 +9,20 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [session, setSession] = useState<any>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Set up auth listener to catch auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
+    // Check for existing session
+    supabase.auth.getSession().then(({ data }) => {
+      console.log("Login: Auth session check:", data.session ? "Session found" : "No session");
+      setSession(data.session);
+      setCheckingAuth(false);
     });
 
-    // Check for existing session without loading state
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    // Set up auth listener to catch auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Login: Auth state change:", event, session ? "Session exists" : "No session");
+      setSession(session);
     });
 
     return () => {
@@ -28,6 +32,7 @@ const Login = () => {
 
   // Redirect if already logged in
   if (session) {
+    console.log("Login: User already logged in, redirecting to dashboard-redirect");
     return <Navigate to="/dashboard-redirect" />;
   }
 

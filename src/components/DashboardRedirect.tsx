@@ -36,7 +36,7 @@ export const DashboardRedirect = () => {
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
-            .maybeSingle(); // Use maybeSingle instead of single to prevent errors
+            .maybeSingle();
 
           if (error) {
             console.error("DashboardRedirect: Error fetching user profile:", error);
@@ -87,6 +87,5 @@ export const DashboardRedirect = () => {
     checkAuth();
   }, [toast]);
 
-  // Immediate redirect
-  return <Navigate to={redirectPath} />;
+  return isReady ? <Navigate to={redirectPath} /> : null;
 };

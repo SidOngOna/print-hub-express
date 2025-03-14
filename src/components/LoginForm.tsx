@@ -54,9 +54,12 @@ export function LoginForm() {
         description: "You have successfully logged in.",
       });
 
+      console.log("LoginForm: Authentication successful, redirecting to dashboard-redirect");
+      // Directly navigate to the dashboard-redirect page
       navigate('/dashboard-redirect');
       
     } catch (error: any) {
+      console.error("LoginForm: Authentication error:", error);
       toast({
         variant: "destructive",
         title: "Error",
