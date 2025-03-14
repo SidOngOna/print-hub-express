@@ -2,67 +2,32 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginForm } from "@/components/LoginForm";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        console.log("Login page: Checking for existing session");
-        setLoading(true);
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error("Login page: Error getting session:", error);
-          toast({
-            variant: "destructive",
-            title: "Session Error",
-            description: "There was an error checking your login status",
-          });
-          setSession(null);
-        } else {
-          console.log("Login page: Session status:", data.session ? "Logged in" : "Not logged in");
-          setSession(data.session);
-        }
-      } catch (error) {
-        console.error("Login page: Error checking auth:", error);
-        setSession(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-    
     // Set up auth listener to catch auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Login page: Auth state changed:", event, session ? "Has session" : "No session");
       setSession(session);
-      
-      if (event === 'SIGNED_IN') {
-        console.log("Login page: User signed in, redirecting to dashboard-redirect");
-        navigate('/dashboard-redirect');
-      }
+    });
+
+    // Check for existing session without loading state
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
     });
 
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [navigate, toast]);
+  }, []);
 
   // Redirect if already logged in
   if (session) {
-    console.log("Login page: Already logged in, redirecting to dashboard-redirect");
     return <Navigate to="/dashboard-redirect" />;
   }
 
@@ -71,32 +36,23 @@ const Login = () => {
       <Navbar />
       <div className="container mx-auto px-4 pt-24 pb-16">
         <div className="max-w-md mx-auto">
-          {loading ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center p-6">
-                <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                <p>Checking authentication...</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
-                <CardDescription className="text-center">
-                  Enter your credentials to sign in
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <LoginForm />
-                <div className="mt-4 text-center text-sm">
-                  <span className="text-muted-foreground">Don't have an account? </span>
-                  <Button variant="link" className="p-0" asChild>
-                    <Link to="/signup">Sign up</Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
+              <CardDescription className="text-center">
+                Enter your credentials to sign in
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LoginForm />
+              <div className="mt-4 text-center text-sm">
+                <span className="text-muted-foreground">Don't have an account? </span>
+                <Button variant="link" className="p-0" asChild>
+                  <Link to="/signup">Sign up</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

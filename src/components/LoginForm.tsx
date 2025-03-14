@@ -38,7 +38,6 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true);
-      console.log("Login attempt with:", values.email);
       
       // Try to sign in with the provided credentials
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -47,23 +46,17 @@ export function LoginForm() {
       });
 
       if (error) {
-        console.error("Sign in error:", error);
         throw error;
       }
-
-      console.log("Login successful, user data:", data.user);
-      console.log("Session created:", data.session?.access_token ? "Yes" : "No");
       
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
 
-      console.log("Redirecting to dashboard-redirect for role verification");
       navigate('/dashboard-redirect');
       
     } catch (error: any) {
-      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Error",
