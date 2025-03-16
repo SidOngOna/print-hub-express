@@ -42,6 +42,22 @@ const SignUp = () => {
         throw new Error("Invalid admin secret. Please contact system administrator.");
       }
 
+      // First check if user already exists
+      const { data: existingUser, error: checkError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: "dummy-password-for-check",
+      });
+      
+      // If signIn error is not about invalid credentials, it's another error
+      if (checkError && !checkError.message.includes("Invalid login credentials")) {
+        throw checkError;
+      }
+      
+      // If we got a session back, user exists
+      if (existingUser && existingUser.session) {
+        throw new Error("An account with this email already exists. Please log in instead.");
+      }
+
       const { error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -68,7 +84,14 @@ const SignUp = () => {
       });
 
       if (!loginError) {
-        navigate("/dashboard-redirect");
+        // Navigate based on role
+        if (formData.role === 'admin') {
+          navigate('/admin-dashboard');
+        } else if (formData.role === 'shopkeeper') {
+          navigate('/shop-dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error: any) {
       toast({

@@ -49,14 +49,37 @@ export function LoginForm() {
         throw error;
       }
       
+      console.log("LoginForm: Authentication successful, user:", data.user?.id);
+      
+      // Check user role and navigate directly to the appropriate dashboard
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .maybeSingle();
+        
+      if (profileError) {
+        console.error("LoginForm: Error fetching user profile:", profileError);
+        // If we can't determine the role, go to the redirect handler
+        navigate('/dashboard-redirect');
+        return;
+      }
+      
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
 
-      console.log("LoginForm: Authentication successful, redirecting to dashboard-redirect");
-      // Directly navigate to the dashboard-redirect page
-      navigate('/dashboard-redirect');
+      console.log("LoginForm: User role:", profileData?.role);
+      
+      // Redirect based on role
+      if (profileData?.role === 'admin') {
+        navigate('/admin-dashboard');
+      } else if (profileData?.role === 'shopkeeper') {
+        navigate('/shop-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
       
     } catch (error: any) {
       console.error("LoginForm: Authentication error:", error);

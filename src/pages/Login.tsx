@@ -30,9 +30,26 @@ const Login = () => {
     };
   }, []);
 
-  // Redirect if already logged in
+  // If we're checking auth, don't show anything
+  if (checkingAuth) {
+    return null;
+  }
+
+  // Redirect if already logged in directly to appropriate dashboard
   if (session) {
-    console.log("Login: User already logged in, redirecting to dashboard-redirect");
+    console.log("Login: User already logged in");
+    // Check user metadata for role to redirect directly
+    const userRole = session.user.user_metadata?.role;
+    
+    if (userRole === 'admin') {
+      return <Navigate to="/admin-dashboard" />;
+    } else if (userRole === 'shopkeeper') {
+      return <Navigate to="/shop-dashboard" />;
+    } else if (userRole === 'user') {
+      return <Navigate to="/dashboard" />;
+    }
+    
+    // Fallback to redirect component if role not determined
     return <Navigate to="/dashboard-redirect" />;
   }
 

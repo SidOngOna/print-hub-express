@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export const DashboardRedirect = () => {
   const { toast } = useToast();
   const [redirectPath, setRedirectPath] = useState<string>("/login");
   const [isReady, setIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -19,6 +21,7 @@ export const DashboardRedirect = () => {
           console.log("DashboardRedirect: No session found, redirecting to login");
           setRedirectPath("/login");
           setIsReady(true);
+          setIsLoading(false);
           return;
         }
 
@@ -81,11 +84,21 @@ export const DashboardRedirect = () => {
         setRedirectPath("/login");
       } finally {
         setIsReady(true);
+        setIsLoading(false);
       }
     };
 
     checkAuth();
   }, [toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+        <p>Redirecting...</p>
+      </div>
+    );
+  }
 
   return isReady ? <Navigate to={redirectPath} /> : null;
 };
