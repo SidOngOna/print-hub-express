@@ -6,6 +6,7 @@ import { Link, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const [session, setSession] = useState<any>(null);
@@ -30,9 +31,14 @@ const Login = () => {
     };
   }, []);
 
-  // If we're checking auth, don't show anything
+  // If we're checking auth, show a loading indicator
   if (checkingAuth) {
-    return null;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   // Redirect if already logged in directly to appropriate dashboard
@@ -53,6 +59,7 @@ const Login = () => {
     return <Navigate to="/dashboard-redirect" />;
   }
 
+  // If not logged in, display the login form
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       <Navbar />
