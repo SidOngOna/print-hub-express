@@ -95,7 +95,7 @@ export const DashboardRedirect = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-        <p>Redirecting...</p>
+        <p>Redirecting to the right dashboard...</p>
       </div>
     );
   }

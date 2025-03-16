@@ -51,7 +51,29 @@ export function LoginForm() {
       
       console.log("LoginForm: Authentication successful, user:", data.user?.id);
       
-      // Check user role and navigate directly to the appropriate dashboard
+      // First check user metadata for role (faster)
+      const userRole = data.user.user_metadata?.role;
+      
+      if (userRole) {
+        console.log("LoginForm: User role from metadata:", userRole);
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully logged in.",
+        });
+        
+        // Redirect based on role from metadata
+        if (userRole === 'admin') {
+          navigate('/admin-dashboard');
+        } else if (userRole === 'shopkeeper') {
+          navigate('/shop-dashboard');
+        } else {
+          navigate('/dashboard');
+        }
+        return;
+      }
+      
+      // If role not in metadata, check the profiles table
+      console.log("LoginForm: Checking user role from database");
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('role')
@@ -70,9 +92,16 @@ export function LoginForm() {
         description: "You have successfully logged in.",
       });
 
-      console.log("LoginForm: User role:", profileData?.role);
+      console.log("LoginForm: User role from database:", profileData?.role);
       
-      // Redirect based on role
+      // Update user metadata with role from database for future use
+      if (profileData?.role) {
+        await supabase.auth.updateUser({
+          data: { role: profileData.role }
+        });
+      }
+      
+      // Redirect based on role from database
       if (profileData?.role === 'admin') {
         navigate('/admin-dashboard');
       } else if (profileData?.role === 'shopkeeper') {
