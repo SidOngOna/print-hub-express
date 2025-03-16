@@ -6,22 +6,15 @@ import { Link, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const [session, setSession] = useState<any>(null);
-  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
     // Check for existing session
     supabase.auth.getSession().then(({ data }) => {
       console.log("Login: Auth session check:", data.session ? "Session found" : "No session");
       setSession(data.session);
-      setCheckingAuth(false);
-    })
-    .catch(error => {
-      console.error("Login: Error checking session:", error);
-      setCheckingAuth(false); // Make sure we exit loading state even on error
     });
 
     // Set up auth listener to catch auth state changes
@@ -34,16 +27,6 @@ const Login = () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
-
-  // If we're checking auth, show a loading indicator
-  if (checkingAuth) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-        <p>Loading...</p>
-      </div>
-    );
-  }
 
   // Redirect if already logged in directly to appropriate dashboard
   if (session) {
