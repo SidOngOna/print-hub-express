@@ -18,6 +18,10 @@ const Login = () => {
       console.log("Login: Auth session check:", data.session ? "Session found" : "No session");
       setSession(data.session);
       setCheckingAuth(false);
+    })
+    .catch(error => {
+      console.error("Login: Error checking session:", error);
+      setCheckingAuth(false); // Make sure we exit loading state even on error
     });
 
     // Set up auth listener to catch auth state changes
